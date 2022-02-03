@@ -1,8 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import words from './words'
+import answers from './answers'
 
 const numOfFields = 5;
+const numOfRows = 3;
+const answer = answers[getRandomInt(2080)];
+console.log(answer);
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 
 const handleChange = e => {
   const { maxLength, value, name } = e.target;
@@ -12,36 +21,64 @@ const handleChange = e => {
   // Check if they hit the max character length
   if (value.length >= maxLength) {
     // Check if it's not the last input field
-    //console.log(parseInt(fieldIndex-1, 10));
-    //console.log(numOfFields * rowIndex);
     if (parseInt(fieldIndex, 10) < (numOfFields * rowIndex) - 1) {
       // Get the next input field
-      console.log("here");
       const nextSibling = document.querySelector(
         `input[name=item-${parseInt(fieldIndex, 10) + 1}]`
       );
-      //console.log(nextSibling);
 
       // If found, focus the next field
       if (nextSibling !== null) {
-        //console.log("trying");
         nextSibling.focus();
       }
     } else {
         if(e.key === 'Enter'){
-            console.log('enter press here! ');
-            for(var i = 1; i < 6; i++){
-                const nextSibling = document.querySelector(
-                    `input[name=item-${parseInt(fieldIndex, 10) + i}]`
-                );
-                nextSibling.classList.remove("inactive-square");
+          var input = '';
+          for(var i = 0; i < numOfFields; i++){
+            const nextSibling = document.querySelector(
+                `input[name=item-${parseInt(fieldIndex-4, 10) + i}]`
+            );
+            input += nextSibling.value;
+          }
+          if(words[input.toLowerCase()]){
+            for(var i = 0; i < numOfFields; i++){
+              const nextSibling = document.querySelector(
+                  `input[name=item-${parseInt(fieldIndex-4, 10) + i}]`
+              );
+              if(answer.includes(input.at(i))){
+                nextSibling.classList.add("yellow-square");
+              }
+              if(input.at(i) == answer.at(i)){
+                nextSibling.classList.remove("yellow-square");
+                nextSibling.classList.add("green-square");
+              }
             }
+            if(input == answer){
+              alert("Congrats you won!")
+            }
+            else if (parseInt(rowIndex, 10) < numOfRows) {
+              const nextRow = document.querySelector(
+                `input[name=item-${parseInt(fieldIndex, 10) + 1}]`
+              );
+              if (nextRow !== null) {
+                for(var i = 1; i < 6; i++){
+                  const nextSibling = document.querySelector(
+                      `input[name=item-${parseInt(fieldIndex, 10) + i}]`
+                  );
+                  nextSibling.classList.remove("inactive-square");
+                  nextSibling.removeAttribute("disabled");
+                }
+                nextRow.focus();
+              }
+            } else {
+              alert("Sorry you did not win, the correct answer was: " + answer);
+            }
+          }
         }
     }
   } else {
     if(e.key === 'Backspace'){
-        if (parseInt(fieldIndex, 10) > 0) {
-          console.log('deleting');
+        if (parseInt(fieldIndex, 10) > ((rowIndex-1)*5)) {
           // Get the next input field
           const prevSibling = document.querySelector(
             `input[name=item-${parseInt(fieldIndex, 10) - 1}]`
@@ -51,8 +88,6 @@ const handleChange = e => {
           if (prevSibling !== null) {
             prevSibling.focus();
           }
-        } else {
-          console.log('first');
         }
     }
   }
@@ -61,7 +96,7 @@ const handleChange = e => {
 class Square extends React.Component {
     render() {
       return (
-        <input maxLength="1" onKeyDown={handleChange} name={`item-${ this.props.value }`} className={`square ${this.props.value > 4 ? "inactive-square" : ""}`}>
+        <input maxLength="1" onKeyDown={handleChange} name={`item-${ this.props.value }`} className={`square ${this.props.value > 4 ? "inactive-square" : ""}`} disabled={this.props.value > 4}>
           {/* TODO */}
         </input>
       );

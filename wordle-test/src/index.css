@@ -54,3 +54,10 @@ body {
     background: #D3D3D3;
   }
   
+  .green-square {
+    background: green;
+  }
+
+  .yellow-square {
+    background: yellow;
+  }
